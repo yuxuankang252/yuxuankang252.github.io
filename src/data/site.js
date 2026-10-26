@@ -1,10 +1,8 @@
 // 站点所有文案集中在这里，改内容只改这一个文件即可。
-// 注意：github 是占位，换成你自己的。
 
 export const profile = {
   name: 'Coco',
   initials: 'C',
-  monogram: 'C',
   role: '本科在读 · 数据科学与大数据技术',
   github: 'https://github.com/yuxuankang252',
   status: '持续学习中',

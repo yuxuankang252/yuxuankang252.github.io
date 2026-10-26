@@ -1,5 +1,6 @@
 import { heroTagline, profile, techStrip } from '../data/site.js'
 import { IconArrowRight, IconBook, IconGithub } from './Icons.jsx'
+import heroMonster from '../assets/hero-monster.jpg'
 
 export default function Hero() {
   return (
@@ -73,30 +74,24 @@ export default function Hero() {
           </div>
         </div>
 
-        {/* 头像卡：想换成真人照片，把下面这块渐变 div 换成 <img src="avatar.jpg" alt="..." className="h-full w-full object-cover" /> 即可 */}
-        <div className="relative mx-auto w-full max-w-[22rem]">
+        {/* 视觉卡：想换成自己的照片，替换 src/assets/hero-monster.jpg 即可，
+            容器用 aspect-[9/5] + object-cover，任何比例的照片都会等比铺满、不拉伸 */}
+        <div className="relative mx-auto w-full max-w-[24rem] lg:max-w-none">
           <div className="absolute -inset-5 rounded-[2.5rem] bg-gradient-to-tr from-indigo-500/25 via-violet-500/10 to-fuchsia-500/25 blur-2xl" />
 
           <div className="relative rounded-[2rem] border border-black/5 bg-white/70 p-3 shadow-soft backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.06]">
-            <div className="relative aspect-[4/5] overflow-hidden rounded-[1.5rem] bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500">
-              <svg
-                className="absolute inset-0 h-full w-full opacity-30"
-                viewBox="0 0 320 400"
-                fill="none"
-                aria-hidden="true"
-              >
-                <circle cx="250" cy="70" r="90" stroke="white" strokeWidth="1" />
-                <circle cx="250" cy="70" r="130" stroke="white" strokeWidth="1" opacity=".6" />
-                <circle cx="70" cy="350" r="110" stroke="white" strokeWidth="1" opacity=".7" />
-              </svg>
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,.35),transparent_55%)]" />
-              <span
-                className="absolute inset-0 grid place-items-center text-[5.5rem] font-semibold leading-none text-white/95"
-                style={{ textShadow: '0 8px 30px rgba(0,0,0,.18)' }}
-              >
-                {profile.monogram}
-              </span>
-              <span className="absolute bottom-4 left-4 rounded-full bg-black/25 px-2.5 py-1 text-[11px] font-medium text-white backdrop-blur">
+            <div className="relative overflow-hidden rounded-[1.5rem] bg-zinc-100 dark:bg-white/5">
+              <img
+                src={heroMonster}
+                alt="奶蛙怪兽插画"
+                width={1200}
+                height={666}
+                loading="eager"
+                decoding="async"
+                fetchPriority="high"
+                className="aspect-[9/5] w-full object-cover object-center"
+              />
+              <span className="absolute bottom-3 left-3 rounded-full bg-black/35 px-2.5 py-1 text-[11px] font-medium text-white backdrop-blur sm:bottom-4 sm:left-4">
                 {profile.since}
               </span>
             </div>
@@ -112,11 +107,11 @@ export default function Hero() {
             </div>
           </div>
 
-          <div className="absolute -left-8 top-20 hidden rounded-2xl border border-black/5 bg-white/85 px-3.5 py-2.5 text-xs font-medium shadow-lg backdrop-blur sm:block dark:border-white/10 dark:bg-white/10">
+          <div className="absolute -left-8 top-14 hidden rounded-2xl border border-black/5 bg-white/85 px-3.5 py-2.5 text-xs font-medium shadow-lg backdrop-blur sm:block dark:border-white/10 dark:bg-white/10">
             <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-indigo-500" />
             Python · NumPy
           </div>
-          <div className="absolute -right-6 bottom-24 hidden rounded-2xl border border-black/5 bg-white/85 px-3.5 py-2.5 text-xs font-medium shadow-lg backdrop-blur sm:block dark:border-white/10 dark:bg-white/10">
+          <div className="absolute -right-6 bottom-32 hidden rounded-2xl border border-black/5 bg-white/85 px-3.5 py-2.5 text-xs font-medium shadow-lg backdrop-blur sm:block dark:border-white/10 dark:bg-white/10">
             <span className="mr-1.5 inline-block h-1.5 w-1.5 rounded-full bg-fuchsia-500" />
             Tailwind CSS
           </div>

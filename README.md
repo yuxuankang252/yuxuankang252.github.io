@@ -1,6 +1,8 @@
 # 个人网站（React + Tailwind CSS）
 
-线上地址：**https://yuxuankang252.github.io/myweb/**
+线上地址：**https://yuxuankang252.github.io/**
+
+仓库名是 `<用户名>.github.io`，所以站点直接跑在根域名上，不需要子路径。
 
 静态站点，两个部分：**个人介绍**（首页）与 **博客**（占位中，下一步接 Markdown）。
 

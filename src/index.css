@@ -136,11 +136,11 @@ html.dark .nav-solid {
   animation: mp-handle-pulse 2.6s ease-in-out infinite;
 }
 
-/* 面板从左侧拉出 */
+/* 面板从右侧拉出 */
 @keyframes mp-in {
   from {
     opacity: 0;
-    transform: translateX(-40px) scale(0.97);
+    transform: translateX(40px) scale(0.97);
   }
   to {
     opacity: 1;
@@ -149,7 +149,7 @@ html.dark .nav-solid {
 }
 
 .mp-in {
-  transform-origin: left center;
+  transform-origin: right center;
   animation: mp-in 0.36s cubic-bezier(0.22, 1, 0.36, 1);
 }
 

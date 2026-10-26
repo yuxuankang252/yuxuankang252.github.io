@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { PLAYLIST_URL, fetchLyrics, fetchPlaylist, formatTime } from '../lib/meting.js'
 import {
-  IconChevronLeft,
+  IconChevronRight,
   IconList,
   IconMusic,
   IconNext,
@@ -267,30 +267,30 @@ export default function MusicPlayer() {
         onError={onError}
       />
 
-      {/* 收起态：贴在左侧中间的抽屉把手 */}
+      {/* 收起态：贴在右侧中间的抽屉把手 */}
       {!open && (
         <button
           type="button"
           onClick={openPanel}
           aria-label="打开音乐播放器"
           title="音乐"
-          className="group fixed left-0 top-1/2 z-50 flex h-20 w-10 -translate-y-1/2 items-center justify-center rounded-r-2xl bg-gradient-to-b from-indigo-500 via-violet-500 to-fuchsia-500 text-white shadow-lg shadow-indigo-500/25 transition-all duration-300 hover:w-[3.15rem] hover:shadow-xl hover:shadow-fuchsia-500/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white sm:h-24 sm:w-11 dark:focus-visible:ring-offset-ink"
+          className="group fixed right-0 top-1/2 z-50 flex h-20 w-10 -translate-y-1/2 items-center justify-center rounded-l-2xl bg-gradient-to-b from-indigo-500 via-violet-500 to-fuchsia-500 text-white shadow-lg shadow-indigo-500/25 transition-all duration-300 hover:w-[3.15rem] hover:shadow-xl hover:shadow-fuchsia-500/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-white sm:h-24 sm:w-11 dark:focus-visible:ring-offset-ink"
         >
           {playing && (
-            <span className="absolute inset-0 rounded-r-2xl bg-fuchsia-300/25 mp-handle-pulse" aria-hidden="true" />
+            <span className="absolute inset-0 rounded-l-2xl bg-fuchsia-300/25 mp-handle-pulse" aria-hidden="true" />
           )}
           <IconMusic className="relative h-[22px] w-[22px]" />
         </button>
       )}
 
-      {/* 展开态：从左侧拉出的大面板 */}
+      {/* 展开态：从右侧拉出的大面板 */}
       {open && (
         <div
           role="region"
           aria-label="音乐播放器"
-          className="fixed left-0 top-1/2 z-50 -translate-y-1/2"
+          className="fixed right-0 top-1/2 z-50 -translate-y-1/2"
         >
-          <div className="mp-in thin-scroll max-h-[calc(100dvh-1.5rem)] w-[min(92vw,420px)] overflow-y-auto rounded-r-[1.75rem] border border-l-0 border-black/[0.07] bg-white/95 shadow-[0_28px_80px_-24px_rgba(9,9,11,0.45)] backdrop-blur-xl dark:border-white/10 dark:bg-[#0d0d11]/95 dark:shadow-black/70">
+          <div className="mp-in thin-scroll max-h-[calc(100dvh-1.5rem)] w-[min(92vw,420px)] overflow-y-auto rounded-l-[1.75rem] border border-r-0 border-black/[0.07] bg-white/95 shadow-[0_28px_80px_-24px_rgba(9,9,11,0.45)] backdrop-blur-xl dark:border-white/10 dark:bg-[#0d0d11]/95 dark:shadow-black/70">
             {/* 顶部：标签 + 歌单 + 收起 */}
             <div className="flex items-center justify-between px-5 pb-1 pt-4">
               <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-400 dark:text-zinc-500">
@@ -316,7 +316,7 @@ export default function MusicPlayer() {
                   aria-label="收起播放器"
                   className="grid h-8 w-8 place-items-center rounded-full text-zinc-500 transition hover:bg-black/5 hover:text-ink dark:text-zinc-400 dark:hover:bg-white/10 dark:hover:text-white"
                 >
-                  <IconChevronLeft className="h-[17px] w-[17px]" />
+                  <IconChevronRight className="h-[17px] w-[17px]" />
                 </button>
               </div>
             </div>

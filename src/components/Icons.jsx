@@ -215,3 +215,11 @@ export function IconChevronLeft({ className = 'h-4 w-4' }) {
     </svg>
   )
 }
+
+export function IconChevronRight({ className = 'h-4 w-4' }) {
+  return (
+    <svg {...stroke} className={className}>
+      <path d="m9.5 6 6 6-6 6" />
+    </svg>
+  )
+}

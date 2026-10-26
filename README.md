@@ -77,6 +77,20 @@ https://api.qijieya.cn/meting/?server=netease&type=playlist&id=<歌单ID>
 
 > 不想用 Actions 也可以手动部署：`npm run build` 后把 `dist/` 里的文件推到 `gh-pages` 分支，Pages 的 Source 选那个分支。
 
+### 备用推送方式：`scripts/push-api.mjs`
+
+如果 `git push` 连不上 `github.com`（报 `CONNECT tunnel failed` 或超时），可以改用 GitHub REST API 推送：
+
+```bash
+node scripts/push-api.mjs --dry-run   # 先看会推哪些文件
+node scripts/push-api.mjs             # 真正推送
+```
+
+它走 `api.github.com`，只上传内容有变化的文件，提交信息沿用本地最后一次提交，推完同样会触发 Actions 部署。
+token 优先读环境变量 `GH_TOKEN`，没有就用 `git credential fill` 取本机已保存的凭据。
+
+注意：这种方式推上去的提交 sha 与本地不同，网络恢复后先 `git fetch origin && git reset --hard origin/main` 对齐一次。
+
 ## 下一步：Markdown 博客
 
 计划用 `import.meta.glob('./posts/*.md', { query: '?raw', import: 'default' })` 读入 Markdown，  

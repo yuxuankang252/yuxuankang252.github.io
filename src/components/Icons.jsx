@@ -123,3 +123,95 @@ export const skillIcons = {
   monitor: IconMonitor,
   wrench: IconWrench,
 }
+
+/* ---------- 音乐播放器 ---------- */
+
+export function IconMusic({ className = 'h-5 w-5' }) {
+  return (
+    <svg {...stroke} className={className}>
+      <path d="M9 18V6.5l10-2V16" />
+      <circle cx="6" cy="18" r="3" />
+      <circle cx="16" cy="16" r="3" />
+    </svg>
+  )
+}
+
+export function IconPlay({ className = 'h-5 w-5' }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className={className}>
+      <path d="M8 5.2c0-.9 1-1.5 1.8-1l9.1 5.9c.7.5.7 1.5 0 2l-9.1 5.9c-.8.5-1.8-.1-1.8-1z" />
+    </svg>
+  )
+}
+
+export function IconPause({ className = 'h-5 w-5' }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className={className}>
+      <rect x="7.5" y="5" width="3.4" height="14" rx="1.4" />
+      <rect x="13.1" y="5" width="3.4" height="14" rx="1.4" />
+    </svg>
+  )
+}
+
+export function IconPrev({ className = 'h-4 w-4' }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className={className}>
+      <rect x="4" y="5" width="2.6" height="14" rx="1.3" />
+      <path d="M19.4 6.4c0-.8-.9-1.3-1.6-.9l-8.3 5.1c-.6.4-.6 1.3 0 1.7l8.3 5.2c.7.4 1.6-.1 1.6-.9z" />
+    </svg>
+  )
+}
+
+export function IconNext({ className = 'h-4 w-4' }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className={className}>
+      <rect x="17.4" y="5" width="2.6" height="14" rx="1.3" />
+      <path d="M4.6 6.4c0-.8.9-1.3 1.6-.9l8.3 5.1c.6.4.6 1.3 0 1.7l-8.3 5.2c-.7.4-1.6-.1-1.6-.9z" />
+    </svg>
+  )
+}
+
+export function IconList({ className = 'h-4 w-4' }) {
+  return (
+    <svg {...stroke} className={className}>
+      <path d="M8 6h12M8 12h12M8 18h8" />
+      <circle cx="4" cy="6" r="1.1" fill="currentColor" stroke="none" />
+      <circle cx="4" cy="12" r="1.1" fill="currentColor" stroke="none" />
+      <circle cx="4" cy="18" r="1.1" fill="currentColor" stroke="none" />
+    </svg>
+  )
+}
+
+export function IconVolume({ className = 'h-4 w-4' }) {
+  return (
+    <svg {...stroke} className={className}>
+      <path d="M4 9.5h3l4.2-3.4c.6-.5 1.5-.1 1.5.7v10.4c0 .8-.9 1.2-1.5.7L7 14.5H4z" />
+      <path d="M16.5 9a4 4 0 0 1 0 6M19 6.6a7.5 7.5 0 0 1 0 10.8" />
+    </svg>
+  )
+}
+
+export function IconVolumeMute({ className = 'h-4 w-4' }) {
+  return (
+    <svg {...stroke} className={className}>
+      <path d="M4 9.5h3l4.2-3.4c.6-.5 1.5-.1 1.5.7v10.4c0 .8-.9 1.2-1.5.7L7 14.5H4z" />
+      <path d="m16.5 9.5 5 5M21.5 9.5l-5 5" />
+    </svg>
+  )
+}
+
+export function IconChevronDown({ className = 'h-4 w-4' }) {
+  return (
+    <svg {...stroke} className={className}>
+      <path d="m6 9.5 6 6 6-6" />
+    </svg>
+  )
+}
+
+export function IconChevronLeft({ className = 'h-4 w-4' }) {
+  return (
+    <svg {...stroke} className={className}>
+      <path d="m14.5 6-6 6 6 6" />
+    </svg>
+  )
+}

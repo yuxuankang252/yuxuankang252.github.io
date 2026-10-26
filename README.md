@@ -1,6 +1,6 @@
 # 个人网站（React + Tailwind CSS）
 
-线上地址：**https://yuxuankang252.github.io/myweb/**
+线上地址：**https://yuxuankang252.github.io/**
 
 静态站点，两个部分：**个人介绍**（首页）与 **博客**（占位中，下一步接 Markdown）。
 
@@ -22,10 +22,10 @@ index.html                  首页入口
 blog.html                   博客入口（Vite 多页）
 src/
   data/site.js              ← 所有文案：姓名、GitHub、技能、经历、项目
-  components/               Nav / Hero / About / Skills / Journey / Projects / Contact / Footer
+  components/               Nav / Hero / About / Skills / Journey / Projects / Contact / Footer / MusicPlayer
   pages/                    Home.jsx、Blog.jsx
   assets/                   hero-monster.jpg（首屏插画）
-  lib/meting.js             音乐接口封装
+  lib/meting.js             音乐接口封装（Meting-API）
   theme.jsx                 深浅色主题（localStorage 记忆）
   index.css                 Tailwind 指令 + 自定义样式
 scripts/push-api.mjs        git 通道不通时的备用推送脚本
@@ -34,6 +34,16 @@ public/.nojekyll            GitHub Pages 用，别删
 ```
 
 **改内容只需要动 `src/data/site.js`**。
+
+## 音乐播放器
+
+贴在页面**左侧中间**的紫色抽屉把手，点一下从左边拉出面板（`MusicPlayer.jsx`）：
+
+- 收起态：左边缘居中的小把手，播放中会轻微呼吸；点开即从左侧滑出
+- 展开态：420px 宽的大卡片（移动端 92vw），封面 190px、三行滚动歌词、进度条、上一首/播放/下一首、音量
+- 点右上角「列表」切到歌单，可看全部 37 首并直接点播，点「返回播放」或再拉出面板会回到播放界面
+- 收起后音乐继续播；`Esc` 也能收起
+- 歌单与音频来自 `https://api.qijieya.cn/meting/`，换歌单只改 `src/lib/meting.js` 里的 `PLAYLIST_ID`
 
 首屏那张插画想换：直接覆盖 `src/assets/hero-monster.jpg` 即可，**任何比例的照片都能用** —— 容器是 `aspect-[9/5]` + `object-cover`，图片会等比铺满、不会被拉伸；比例和 9:5 差太多的部分会被居中裁掉。想让照片完整露出来，就把 `Hero.jsx` 里 img 的 `aspect-[9/5]` 改成接近照片比例的值（例如竖图用 `aspect-[4/5]`）。
 

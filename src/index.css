@@ -121,6 +121,38 @@ html.dark .nav-solid {
 }
 
 /* ---------- 音乐播放器 ---------- */
+/* 左侧抽屉把手：播放中轻微呼吸 */
+@keyframes mp-handle-pulse {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.mp-handle-pulse {
+  animation: mp-handle-pulse 2.6s ease-in-out infinite;
+}
+
+/* 面板从左侧拉出 */
+@keyframes mp-in {
+  from {
+    opacity: 0;
+    transform: translateX(-40px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0) scale(1);
+  }
+}
+
+.mp-in {
+  transform-origin: left center;
+  animation: mp-in 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 /* 滑杆：用 --p 变量控制已填充比例，浅深色各一套 */
 .range {
   -webkit-appearance: none;
@@ -226,6 +258,10 @@ html.dark .thin-scroll::-webkit-scrollbar-thumb {
     animation: none;
   }
   .animate-ping {
+    animation: none;
+  }
+  .mp-in,
+  .mp-handle-pulse {
     animation: none;
   }
 }

@@ -1,5 +1,7 @@
 # 个人网站（React + Tailwind CSS）
 
+线上地址：**https://yuxuankang252.github.io/myweb/**
+
 静态站点，两个部分：**个人介绍**（首页）与 **博客**（占位中，下一步接 Markdown）。
 
 技术栈：React 19 + Vite 8 + Tailwind CSS 3，`npm run build` 产出纯静态文件，可部署到 GitHub Pages。
@@ -31,6 +33,9 @@ public/.nojekyll            GitHub Pages 用，别删
 **改内容只需要动 `src/data/site.js`**，头像想换真人照片，改 `src/components/Hero.jsx` 里注释标出的那块。
 
 ## 部署到 GitHub Pages
+
+> 本仓库**已经配置完成**，日常只需要 `git add . && git commit && git push`，Actions 会自动构建并发布。
+> 首次配置的完整步骤留在下面，换仓库或重建时参考。
 
 1. 在 GitHub 新建一个空仓库，例如 `my-site`。
 2. 在项目目录执行：

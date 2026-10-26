@@ -6,7 +6,7 @@ export const profile = {
   initials: 'C',
   monogram: 'C',
   role: '本科在读 · 数据科学与大数据技术',
-  github: 'https://github.com/',
+  github: 'https://github.com/yuxuankang252',
   status: '持续学习中',
   availability: '开放交流',
   since: 'Data Science · Undergraduate',

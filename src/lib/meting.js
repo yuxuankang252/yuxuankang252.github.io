@@ -3,34 +3,58 @@
 
 const API = 'https://api.qijieya.cn/meting/'
 export const SERVER = 'netease'
-export const PLAYLIST_ID = '7254616088'
-export const PLAYLIST_URL = `https://music.163.com/#/playlist?id=${PLAYLIST_ID}`
+
+// 播放器的曲目来源：可以放多个歌单，运行时并发拉取、合并后按「歌名+歌手」去重
+// 第一个是主歌单（PLAYLIST_URL 指向它）
+export const PLAYLISTS = [
+  { id: '7254616088', label: '歌单' },
+  { id: '8268569514', label: '我喜欢的音乐' },
+].map((p) => ({ ...p, url: `https://music.163.com/#/playlist?id=${p.id}` }))
+
+export const PLAYLIST_ID = PLAYLISTS[0].id
+export const PLAYLIST_URL = PLAYLISTS[0].url
 
 const meting = (type, id, extra = '') =>
   `${API}?server=${SERVER}&type=${type}&id=${encodeURIComponent(id)}${extra}`
 
 let playlistCache = null
 
-// 拉取歌单，返回 [{ name, artist, url, pic, lrc }]
+async function fetchOne(id) {
+  const res = await fetch(meting('playlist', id))
+  if (!res.ok) throw new Error(`歌单请求失败：HTTP ${res.status}`)
+  const data = await res.json()
+  if (!Array.isArray(data)) throw new Error('歌单返回格式异常')
+  return data
+}
+
+// 拉取全部歌单并合并去重，返回 [{ name, artist, url, pic, lrc }]
 export async function fetchPlaylist() {
   if (playlistCache) return playlistCache
 
-  const res = await fetch(meting('playlist', PLAYLIST_ID))
-  if (!res.ok) throw new Error(`歌单请求失败：HTTP ${res.status}`)
+  // 用 allSettled：某个歌单挂了不影响其他歌单出歌
+  const results = await Promise.allSettled(PLAYLISTS.map((p) => fetchOne(p.id)))
+  const rows = results.flatMap((r) => (r.status === 'fulfilled' ? r.value : []))
+  if (!rows.length) throw new Error('歌单是空的')
 
-  const data = await res.json()
-  if (!Array.isArray(data)) throw new Error('歌单返回格式异常')
+  const seen = new Set()
+  const list = []
 
-  const list = data
-    .filter((t) => t && t.url && t.name)
-    .map((t, i) => ({
-      key: `${i}-${t.name}`,
-      name: String(t.name).trim(),
-      artist: String(t.artist || '').trim() || '未知歌手',
+  rows.forEach((t) => {
+    if (!t || !t.url || !t.name) return
+    const name = String(t.name).trim()
+    const artist = String(t.artist || '').trim() || '未知歌手'
+    const dedupeKey = `${name.toLowerCase()}|${artist.toLowerCase()}`
+    if (seen.has(dedupeKey)) return
+    seen.add(dedupeKey)
+    list.push({
+      key: `${list.length}-${name}`,
+      name,
+      artist,
       url: t.url,
       pic: t.pic || '',
       lrc: t.lrc || '',
-    }))
+    })
+  })
 
   if (!list.length) throw new Error('歌单是空的')
   playlistCache = list

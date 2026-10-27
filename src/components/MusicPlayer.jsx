@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { PLAYLIST_URL, fetchLyrics, fetchPlaylist, formatTime } from '../lib/meting.js'
+import { PLAYLISTS, fetchLyrics, fetchPlaylist, formatTime } from '../lib/meting.js'
 import {
   IconChevronRight,
   IconList,
@@ -505,14 +505,20 @@ export default function MusicPlayer() {
                     </button>
                   ))}
 
-                  <a
-                    href={PLAYLIST_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block border-t border-black/[0.06] px-5 py-3 text-center text-[11.5px] text-zinc-500 transition hover:text-ink dark:border-white/10 dark:hover:text-white"
-                  >
-                    在网易云打开原歌单 ↗
-                  </a>
+                  <div className="flex flex-wrap items-center justify-center gap-x-2.5 gap-y-1 border-t border-black/[0.06] px-5 py-3 text-[11.5px] text-zinc-500 dark:border-white/10">
+                    <span className="text-zinc-400 dark:text-zinc-500">在网易云打开</span>
+                    {PLAYLISTS.map((p) => (
+                      <a
+                        key={p.id}
+                        href={p.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="transition hover:text-ink dark:hover:text-white"
+                      >
+                        {p.label} ↗
+                      </a>
+                    ))}
+                  </div>
                 </div>
               )}
             </div>

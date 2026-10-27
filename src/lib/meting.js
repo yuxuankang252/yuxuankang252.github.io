@@ -18,9 +18,12 @@ const meting = (type, id, extra = '') =>
   `${API}?server=${SERVER}&type=${type}&id=${encodeURIComponent(id)}${extra}`
 
 let playlistCache = null
+let playlistAt = 0
+const PLAYLIST_TTL = 10 * 60 * 1000 // 10 分钟过期：往网易云歌单里加歌后，重新打开就能看到
 
 async function fetchOne(id) {
-  const res = await fetch(meting('playlist', id))
+  // 加时间戳 + no-store：歌单改了以后不拿浏览器里缓存的旧 JSON
+  const res = await fetch(`${meting('playlist', id)}&_t=${Date.now()}`, { cache: 'no-store' })
   if (!res.ok) throw new Error(`歌单请求失败：HTTP ${res.status}`)
   const data = await res.json()
   if (!Array.isArray(data)) throw new Error('歌单返回格式异常')
@@ -28,8 +31,9 @@ async function fetchOne(id) {
 }
 
 // 拉取全部歌单并合并去重，返回 [{ name, artist, url, pic, lrc }]
-export async function fetchPlaylist() {
-  if (playlistCache) return playlistCache
+// force = true 时忽略缓存，强制重新拉取
+export async function fetchPlaylist({ force = false } = {}) {
+  if (!force && playlistCache && Date.now() - playlistAt < PLAYLIST_TTL) return playlistCache
 
   // 用 allSettled：某个歌单挂了不影响其他歌单出歌
   const results = await Promise.allSettled(PLAYLISTS.map((p) => fetchOne(p.id)))
@@ -58,6 +62,7 @@ export async function fetchPlaylist() {
 
   if (!list.length) throw new Error('歌单是空的')
   playlistCache = list
+  playlistAt = Date.now()
   return list
 }
 

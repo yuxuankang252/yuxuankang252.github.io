@@ -43,6 +43,7 @@ export default function MusicPlayer() {
   const [muted, setMuted] = useState(false)
   const [lyricIdx, setLyricIdx] = useState(-1)
   const [note, setNote] = useState('')
+  const [refreshing, setRefreshing] = useState(false)
 
   const track = tracks[index] || null
 
@@ -65,18 +66,37 @@ export default function MusicPlayer() {
   }, [open])
 
   /* ---------- 歌单 ---------- */
-  const load = useCallback(async () => {
-    if (status === 'loading' || status === 'ready') return
-    setStatus('loading')
-    try {
-      const list = await fetchPlaylist()
-      setTracks(list)
-      setStatus('ready')
-    } catch (e) {
-      setStatus('error')
-      toast('音乐加载失败，稍后再试试')
-    }
-  }, [status, toast])
+  const load = useCallback(
+    async (force = false) => {
+      if (status === 'loading') return
+      const hasList = tracks.length > 0
+      if (!hasList) setStatus('loading')
+      if (force) setRefreshing(true)
+      try {
+        const list = await fetchPlaylist({ force })
+        setTracks(list)
+        // 歌单顺序会变（新歌插在前面），按「歌名 + 歌手」重新定位当前这首，别让正在播的歌跳掉
+        setIndex((i) => {
+          const cur = tracks[i]
+          if (!cur) return 0
+          const j = list.findIndex((t) => t.name === cur.name && t.artist === cur.artist)
+          return j >= 0 ? j : 0
+        })
+        setStatus('ready')
+      } catch (e) {
+        if (hasList) {
+          setStatus('ready')
+          toast('歌单刷新失败，继续用上次的列表')
+        } else {
+          setStatus('error')
+          toast('音乐加载失败，稍后再试试')
+        }
+      } finally {
+        setRefreshing(false)
+      }
+    },
+    [status, tracks, toast],
+  )
 
   /* ---------- 音量 ---------- */
   useEffect(() => {
@@ -150,7 +170,7 @@ export default function MusicPlayer() {
   const openPanel = () => {
     setOpen(true)
     setView('play') // 每次拉出都从"正在播放"这面开始，不沿用上次的列表视图
-    if (status === 'idle') load()
+    load() // 缓存 10 分钟内直接用；过期就静默刷新，歌单里加了歌会自动出现
   }
 
   const toggle = async () => {
@@ -447,16 +467,28 @@ export default function MusicPlayer() {
                     <p className="text-[11.5px] font-medium text-zinc-500 dark:text-zinc-400">
                       {status === 'ready' ? `歌单 · ${tracks.length} 首` : '歌单'}
                     </p>
-                    <button
-                      type="button"
-                      onClick={() => setView('play')}
-                      className="text-[11.5px] font-medium text-indigo-500 transition hover:text-indigo-600 dark:text-indigo-400 dark:hover:text-indigo-300"
-                    >
-                      返回播放
-                    </button>
+                    <div className="flex items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => load(true)}
+                        disabled={refreshing}
+                        aria-label="刷新歌单"
+                        title="重新拉取歌单（网易云里新加的歌会同步过来）"
+                        className="text-[11.5px] font-medium text-zinc-400 transition hover:text-ink disabled:cursor-default disabled:opacity-60 dark:text-zinc-500 dark:hover:text-white"
+                      >
+                        {refreshing ? '刷新中…' : '刷新'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setView('play')}
+                        className="text-[11.5px] font-medium text-indigo-500 transition hover:text-indigo-600 dark:text-indigo-400 dark:hover:text-indigo-300"
+                      >
+                        返回播放
+                      </button>
+                    </div>
                   </div>
 
-                  {status === 'loading' && (
+                  {status === 'loading' && !tracks.length && (
                     <p className="px-5 py-10 text-center text-[12.5px] text-zinc-500">正在读取歌单…</p>
                   )}
                   {status === 'error' && (
@@ -464,7 +496,7 @@ export default function MusicPlayer() {
                       <p className="text-[12.5px] text-zinc-500">歌单没加载出来</p>
                       <button
                         type="button"
-                        onClick={() => load()}
+                        onClick={() => load(true)}
                         className="mt-2.5 rounded-full border border-black/10 px-3.5 py-1.5 text-[12px] font-medium transition hover:bg-black/5 dark:border-white/15 dark:hover:bg-white/10"
                       >
                         重试

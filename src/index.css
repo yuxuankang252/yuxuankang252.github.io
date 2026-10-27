@@ -104,6 +104,16 @@ html.dark .nav-solid {
   box-shadow: 0 24px 48px -24px rgba(9, 9, 11, 0.28);
 }
 
+/* ---------- 隐藏滚动条（横向滑动容器用） ---------- */
+.no-scrollbar {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 /* ---------- 提示条 ---------- */
 .toast {
   transition: opacity 0.3s ease, transform 0.3s ease;

@@ -101,6 +101,7 @@ export const projects = [
   {
     title: '反向传播算法实现',
     kind: '机器学习',
+    time: '2026 · 秋',
     desc: '不依赖深度学习框架，用 NumPy 实现多层感知机的前向传播、链式法则反向传播与梯度校验。',
     tags: ['Python', 'NumPy'],
     art: 'curve',
@@ -109,6 +110,7 @@ export const projects = [
   {
     title: '个人网站 & Markdown 博客',
     kind: '前端',
+    time: '2026 · 秋',
     desc: 'React + Tailwind CSS 的静态站点，深浅色主题与滚动动效，博客由 Markdown 渲染成静态 HTML。',
     tags: ['React', 'Tailwind'],
     art: 'layout',
@@ -117,6 +119,7 @@ export const projects = [
   {
     title: '图像特征分析实验',
     kind: '图像',
+    time: '2026 · 秋',
     desc: 'SIFT 关键点提取与 YCbCr 肤色阈值分割，量化对比不同参数下的检出效果。',
     tags: ['scikit-image', 'NumPy'],
     art: 'circles',

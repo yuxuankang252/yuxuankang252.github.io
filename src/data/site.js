@@ -73,56 +73,37 @@ export const skills = [
   },
 ]
 
+// 「最近的脚步」= 经历 + 做过的东西合并成一条时间线。
+// 从最近的一条往后排，滑动即可回看。art / gradient 决定封面插图，accent 决定圆点和徽章颜色。
 export const journey = [
   {
     time: '2026 · 秋',
-    title: '《AI 实践》课程实验',
-    desc: '从零实现反向传播算法：手推链式法则、用 NumPy 完成前向与反向计算、以数值梯度校验解析梯度，并记录损失收敛曲线。',
-    tags: ['NumPy', '梯度校验'],
+    title: '反向传播算法实现',
+    kind: '机器学习',
+    desc: '不依赖任何深度学习框架，手推链式法则、用 NumPy 写完多层感知机的前向与反向传播，再用数值梯度校验解析梯度，记录损失收敛曲线。',
+    tags: ['Python', 'NumPy', '梯度校验'],
+    art: 'curve',
+    gradient: 'from-indigo-500 to-violet-600',
     accent: 'indigo',
   },
   {
     time: '2026 · 秋',
     title: '个人站点 & Markdown 博客',
-    desc: '用 React + Tailwind CSS 构建并静态导出，支持深浅色主题与滚动动效；博客内容以 Markdown 编写，再渲染成静态 HTML 页面。',
+    kind: '前端',
+    desc: '用 React + Tailwind CSS 构建并静态导出，支持深浅色主题与滚动动效；博客内容以 Markdown 写作，再渲染成静态 HTML 页面。',
     tags: ['React', 'Tailwind CSS', 'Markdown'],
+    art: 'layout',
+    gradient: 'from-fuchsia-500 to-rose-500',
     accent: 'fuchsia',
   },
   {
     time: '2026 · 秋',
     title: '图像特征与颜色空间实验',
-    desc: '用 scikit-image 提取 SIFT 关键点与描述子，并在 YCbCr 颜色空间上做肤色阈值分割，对比不同参数下的检出差异。',
-    tags: ['scikit-image', '图像处理'],
-    accent: 'cyan',
-  },
-]
-
-export const projects = [
-  {
-    title: '反向传播算法实现',
-    kind: '机器学习',
-    time: '2026 · 秋',
-    desc: '不依赖深度学习框架，用 NumPy 实现多层感知机的前向传播、链式法则反向传播与梯度校验。',
-    tags: ['Python', 'NumPy'],
-    art: 'curve',
-    gradient: 'from-indigo-500 to-violet-600',
-  },
-  {
-    title: '个人网站 & Markdown 博客',
-    kind: '前端',
-    time: '2026 · 秋',
-    desc: 'React + Tailwind CSS 的静态站点，深浅色主题与滚动动效，博客由 Markdown 渲染成静态 HTML。',
-    tags: ['React', 'Tailwind'],
-    art: 'layout',
-    gradient: 'from-fuchsia-500 to-rose-500',
-  },
-  {
-    title: '图像特征分析实验',
-    kind: '图像',
-    time: '2026 · 秋',
-    desc: 'SIFT 关键点提取与 YCbCr 肤色阈值分割，量化对比不同参数下的检出效果。',
-    tags: ['scikit-image', 'NumPy'],
+    kind: '图像处理',
+    desc: '用 scikit-image 提取 SIFT 关键点与描述子，在 YCbCr 颜色空间上做肤色阈值分割，量化对比不同参数下的检出效果。',
+    tags: ['scikit-image', 'NumPy', '图像处理'],
     art: 'circles',
     gradient: 'from-cyan-500 to-teal-600',
+    accent: 'cyan',
   },
 ]

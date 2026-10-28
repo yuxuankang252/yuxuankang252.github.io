@@ -6,8 +6,7 @@ import { IconClose, IconMenu, IconMoon, IconSun } from './Icons.jsx'
 const links = [
   { hash: '#about', label: '关于' },
   { hash: '#skills', label: '技能' },
-  { hash: '#journey', label: '经历' },
-  { hash: '#projects', label: '项目' },
+  { hash: '#journey', label: '历程' },
 ]
 
 const linkClass =

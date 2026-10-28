@@ -44,10 +44,10 @@ export default function Hero() {
 
           <div className="mt-9 flex flex-wrap items-center gap-3">
             <a
-              href="#projects"
+              href="#journey"
               className="inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 text-[15px] font-medium text-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-ink/25 dark:bg-white dark:text-ink dark:hover:shadow-white/10"
             >
-              看看我的项目
+              看看最近的脚步
               <IconArrowRight />
             </a>
             <a

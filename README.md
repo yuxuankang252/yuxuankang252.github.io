@@ -2,7 +2,7 @@
 
 线上地址：**https://yuxuankang252.github.io/**
 
-静态站点，两个部分：**个人介绍**（首页）与 **博客**（占位中，下一步接 Markdown）。
+静态站点，两个部分：**个人介绍**（首页）与 **博客**（Markdown 写作，构建时编译成 HTML）。
 
 技术栈：React 19 + Vite 8 + Tailwind CSS 3，`npm run build` 产出纯静态文件，可部署到 GitHub Pages。
 
@@ -20,11 +20,15 @@ npm run preview  # 预览构建结果
 ```
 index.html                  首页入口
 blog.html                   博客入口（Vite 多页）
+plugins/markdown.mjs        ← 把 .md 编译成 HTML 的 Vite 插件
 src/
-  data/site.js              ← 所有文案：姓名、GitHub、技能、经历、项目
-  components/               Nav / Hero / About / Skills / Journey / Projects / Contact / Footer / MusicPlayer
+  data/site.js              ← 所有文案：姓名、GitHub、技能、经历
+  posts/                    ← 文章放这里，一个 .md 一篇
+  components/               Nav / Hero / About / Skills / Journey / Contact / Footer / MusicPlayer
+  components/blog/          博客的列表页、正文页、目录
   pages/                    Home.jsx、Blog.jsx
   assets/                   hero-monster.jpg（首屏插画）
+  lib/posts.js              文章数据整理（排序、标签统计、上一篇/下一篇）
   lib/meting.js             音乐接口封装（Meting-API）
   theme.jsx                 深浅色主题（localStorage 记忆）
   index.css                 Tailwind 指令 + 自定义样式
@@ -33,7 +37,30 @@ public/.nojekyll            GitHub Pages 用，别删
 .github/workflows/deploy.yml  推送即自动部署
 ```
 
-**改内容只需要动 `src/data/site.js`**。
+**改文案只需要动 `src/data/site.js`；写文章只需要往 `src/posts/` 里加文件。**
+
+## 写一篇博客
+
+在 `src/posts/` 新建一个 `.md` 文件，文件名就是链接里的 slug（`backprop-from-scratch.md` → `blog.html#/post/backprop-from-scratch`）：
+
+```markdown
+---
+title: 用 NumPy 从零实现反向传播
+date: 2026-10-06
+tags: [机器学习, NumPy]
+summary: 一句话摘要，会显示在列表页和分享描述里。
+draft: false
+---
+
+正文从这里开始，用普通 Markdown 写就行。
+```
+
+- `title` / `date` / `tags` / `summary` 四项是给列表页和 SEO 用的；`draft: true` 的文章不会出现在站点上。
+- `##` 和 `###` 标题会自动生成锚点并汇总成右侧目录。
+- 代码块用 ````` ```python ``` `` 这样的围栏写法，构建时用 highlight.js 上色，页面上每块都会自动出现「复制」按钮。
+- 图片放进 `public/posts/`，正文里写 `![](posts/xxx.png)`（`public/` 下的文件会原样复制到 `dist/` 根目录）。
+
+文章链接是 hash 形式（`blog.html#/post/slug`），这样在 GitHub Pages 上刷新不会 404。上线流程和改文案一样：`git commit` + 推送，Actions 会自动构建。
 
 ## 音乐播放器
 
@@ -72,7 +99,17 @@ public/.nojekyll            GitHub Pages 用，别删
 
 > 不想用 Actions 也可以手动部署：`npm run build` 后把 `dist/` 里的文件推到 `gh-pages` 分支，Pages 的 Source 选那个分支。
 
-## 下一步：Markdown 博客
+## 博客是怎么工作的
 
-计划用 `import.meta.glob('./posts/*.md', { query: '?raw', import: 'default' })` 读入 Markdown，  
-构建时渲染成静态 HTML（代码块语法高亮），文章按时间倒序展示在 `blog.html`。
+`plugins/markdown.mjs` 是一个 30 行的 Vite 插件，在**构建时**把 `src/posts/*.md` 编译成 JS 模块：
+
+```
+.md 文件  →  gray-matter 读头部元信息
+          →  markdown-it 把正文转 HTML（顺带给标题加 id、收集目录）
+          →  highlight.js 给代码块上色
+          →  export default { slug, meta, html, toc, minutes }
+```
+
+所以浏览器里**没有** markdown-it 和 highlight.js（整包 gzip 后 7.9 kB），只拿到现成的 HTML 字符串。`src/lib/posts.js` 用 `import.meta.glob` 把编译结果收集起来做排序和标签统计，`src/pages/Blog.jsx` 用一个极简 hash 路由决定显示列表还是正文。
+
+不用 react-router 是有意的：GitHub Pages 上刷新 `/posts/xxx` 这类真实子路径会 404，hash 不会。

@@ -1,81 +1,85 @@
-import Nav from '../components/Nav.jsx'
+import { useEffect, useState } from 'react'
 import Footer from '../components/Footer.jsx'
-import { IconArrowLeft } from '../components/Icons.jsx'
+import Nav from '../components/Nav.jsx'
+import PostList from '../components/blog/PostList.jsx'
+import PostView from '../components/blog/PostView.jsx'
+import { findPost } from '../lib/posts.js'
 
-const steps = [
-  {
-    title: '写 Markdown',
-    desc: '文章放在 posts/ 目录里，文件头部写标题、日期、标签等元信息。',
-    code: 'posts/backprop-from-scratch.md',
-  },
-  {
-    title: '渲染成 HTML',
-    desc: '构建时把 Markdown 转成 HTML 字符串，交给 React 渲染，代码块带语法高亮。',
-    code: 'import.meta.glob("./posts/*.md", { as: "raw" })',
-  },
-  {
-    title: '列表与详情',
-    desc: '博客首页按时间倒序列出文章，点进去是单篇正文，链接可直接分享。',
-    code: '/blog.html#/posts/backprop-from-scratch',
-  },
-]
+/* 极简 hash 路由：
+   #/              文章列表
+   #/tag/机器学习   按标签筛选
+   #/post/<slug>   单篇正文
+   不用 react-router —— GitHub Pages 上刷新子路由会 404，hash 不会。 */
+function parseHash() {
+  const raw = window.location.hash.replace(/^#\/?/, '')
+  const [kind, value] = raw.split('/')
+  if (kind === 'post' && value) return { view: 'post', slug: decodeURIComponent(value), tag: '' }
+  if (kind === 'tag' && value) return { view: 'list', slug: '', tag: decodeURIComponent(value) }
+  return { view: 'list', slug: '', tag: '' }
+}
+
+const description = 'Coco 的博客 —— 数据科学、机器学习实验记录与前端笔记。'
 
 export default function Blog() {
+  const [route, setRoute] = useState(parseHash)
+
+  useEffect(() => {
+    const onHashChange = () => setRoute(parseHash())
+    window.addEventListener('hashchange', onHashChange)
+    return () => window.removeEventListener('hashchange', onHashChange)
+  }, [])
+
+  const post = route.view === 'post' ? findPost(route.slug) : null
+
+  /* 切页面：更新标题/描述，并滚回顶部（分享出去的链接打开就在开头） */
+  useEffect(() => {
+    if (route.view === 'post' && post) {
+      document.title = `${post.meta.title} · Coco`
+      let meta = document.querySelector('meta[name="description"]')
+      if (!meta) {
+        meta = document.createElement('meta')
+        meta.setAttribute('name', 'description')
+        document.head.appendChild(meta)
+      }
+      meta.setAttribute('content', post.meta.summary || description)
+    } else {
+      document.title = '博客 · Coco'
+      document.querySelector('meta[name="description"]')?.setAttribute('content', description)
+    }
+    window.scrollTo({ top: 0, behavior: 'instant' })
+  }, [route.view, route.slug, post])
+
   return (
     <>
       <Nav homePrefix="index.html" current="blog" />
 
-      <main className="relative overflow-hidden px-5 pb-24 pt-32 sm:px-8 sm:pt-40">
+      <main className="relative overflow-hidden px-5 pb-24 pt-28 sm:px-8 sm:pt-36">
         <div className="pointer-events-none absolute inset-0 -z-10">
           <div className="grid-bg absolute inset-0" />
-          <div className="blob -left-24 -top-16 h-72 w-72 bg-indigo-400/30 dark:bg-indigo-600/25" />
-          <div className="blob right-0 top-10 h-72 w-72 bg-fuchsia-400/20 dark:bg-fuchsia-600/20" />
+          <div className="blob -left-24 -top-16 h-72 w-72 bg-indigo-400/25 dark:bg-indigo-600/20" />
+          <div className="blob right-0 top-10 h-72 w-72 bg-fuchsia-400/15 dark:bg-fuchsia-600/15" />
         </div>
 
-        <div className="mx-auto max-w-3xl text-center">
-          <p className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/70 px-3 py-1.5 text-xs font-medium text-zinc-600 backdrop-blur dark:border-white/15 dark:bg-white/5 dark:text-zinc-300">
-            <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
-            正在搭建
-          </p>
-
-          <h1 className="mt-6 text-4xl font-semibold tracking-tight sm:text-5xl">
-            博客<span className="text-indigo-500">·</span>即将上线
-          </h1>
-          <p className="mx-auto mt-5 max-w-xl text-[15px] leading-[1.9] text-zinc-600 dark:text-zinc-400">
-            这里会放实验记录、踩坑复盘和读代码的笔记。文章用 Markdown 编写，再由 Vite 在构建时渲染成静态 HTML，和首页保持同一套设计语言。
-          </p>
-
-          <div className="mx-auto mt-10 grid max-w-xl gap-3 text-left">
-            {steps.map((step, index) => (
-              <div
-                key={step.title}
-                className="flex items-start gap-3 rounded-2xl border border-black/5 bg-white/70 p-4 backdrop-blur dark:border-white/10 dark:bg-white/[0.04]"
+        {route.view === 'post' ? (
+          post ? (
+            <PostView key={post.slug} post={post} />
+          ) : (
+            <div className="mx-auto max-w-xl py-20 text-center">
+              <h1 className="text-2xl font-semibold tracking-tight">这篇文章找不到了</h1>
+              <p className="mt-3 text-[14.5px] text-zinc-500">
+                可能是链接写错了，或者文章已经改名。
+              </p>
+              <a
+                href="#/"
+                className="mt-7 inline-flex rounded-full bg-ink px-5 py-2.5 text-[14px] font-medium text-white dark:bg-white dark:text-ink"
               >
-                <span className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full bg-indigo-500/10 text-[11px] font-semibold text-indigo-600 dark:bg-indigo-400/15 dark:text-indigo-400">
-                  {index + 1}
-                </span>
-                <div>
-                  <p className="text-[14px] leading-relaxed text-zinc-600 dark:text-zinc-400">
-                    <span className="font-medium text-ink dark:text-white">{step.title}</span>
-                    {' —— '}
-                    {step.desc}
-                  </p>
-                  <code className="mt-2 inline-block rounded-md bg-black/5 px-2 py-1 text-[12px] text-zinc-500 dark:bg-white/10 dark:text-zinc-400">
-                    {step.code}
-                  </code>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          <a
-            href="index.html"
-            className="mt-10 inline-flex items-center gap-2 rounded-full bg-ink px-6 py-3 text-[15px] font-medium text-white transition hover:-translate-y-0.5 hover:shadow-xl hover:shadow-ink/25 dark:bg-white dark:text-ink"
-          >
-            <IconArrowLeft />
-            先看看个人介绍
-          </a>
-        </div>
+                回到文章列表
+              </a>
+            </div>
+          )
+        ) : (
+          <PostList activeTag={route.tag} />
+        )}
       </main>
 
       <Footer homePrefix="index.html" />

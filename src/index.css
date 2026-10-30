@@ -252,6 +252,315 @@ html.dark .thin-scroll::-webkit-scrollbar-thumb {
   background: transparent;
 }
 
+/* ---------- 博客正文排版 ---------- */
+.prose-coco {
+  font-size: 15.5px;
+  line-height: 1.9;
+  color: #3f3f46;
+  overflow-wrap: break-word;
+}
+
+html.dark .prose-coco {
+  color: #d4d4d8;
+}
+
+.prose-coco > :first-child {
+  margin-top: 0;
+}
+
+.prose-coco > * + * {
+  margin-top: 1.15em;
+}
+
+.prose-coco h2,
+.prose-coco h3,
+.prose-coco h4 {
+  scroll-margin-top: 6.5rem;
+  color: #0b0b0f;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.4;
+}
+
+html.dark .prose-coco h2,
+html.dark .prose-coco h3,
+html.dark .prose-coco h4 {
+  color: #fafafa;
+}
+
+.prose-coco h2 {
+  margin-top: 2.5em;
+  padding-bottom: 0.4em;
+  border-bottom: 1px solid rgba(9, 9, 11, 0.07);
+  font-size: 1.4rem;
+}
+
+html.dark .prose-coco h2 {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.prose-coco h3 {
+  margin-top: 2em;
+  font-size: 1.12rem;
+}
+
+.prose-coco h4 {
+  margin-top: 1.7em;
+  font-size: 1rem;
+}
+
+.prose-coco strong {
+  font-weight: 600;
+  color: #18181b;
+}
+
+html.dark .prose-coco strong {
+  color: #f4f4f5;
+}
+
+.prose-coco a {
+  color: #4f46e5;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  text-decoration-color: rgba(79, 70, 229, 0.35);
+  transition: text-decoration-color 0.2s ease;
+}
+
+.prose-coco a:hover {
+  text-decoration-color: #4f46e5;
+}
+
+html.dark .prose-coco a {
+  color: #a5b4fc;
+  text-decoration-color: rgba(165, 180, 252, 0.35);
+}
+
+html.dark .prose-coco a:hover {
+  text-decoration-color: #a5b4fc;
+}
+
+.prose-coco ul {
+  list-style: disc;
+  padding-left: 1.45em;
+}
+
+.prose-coco ol {
+  list-style: decimal;
+  padding-left: 1.55em;
+}
+
+.prose-coco li + li {
+  margin-top: 0.4em;
+}
+
+.prose-coco li::marker {
+  color: #a1a1aa;
+}
+
+.prose-coco blockquote {
+  border-left: 2px solid #a5b4fc;
+  padding: 0.1em 0 0.1em 1.1em;
+  color: #52525b;
+}
+
+html.dark .prose-coco blockquote {
+  border-left-color: rgba(129, 140, 248, 0.5);
+  color: #a1a1aa;
+}
+
+.prose-coco hr {
+  margin: 2.5em 0;
+  border-color: rgba(9, 9, 11, 0.08);
+}
+
+html.dark .prose-coco hr {
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* 表格：窄屏自己横向滚动，不撑破页面 */
+.prose-coco table {
+  display: block;
+  width: 100%;
+  overflow-x: auto;
+  border-collapse: collapse;
+  font-size: 13.5px;
+}
+
+.prose-coco th,
+.prose-coco td {
+  padding: 0.55em 0.8em;
+  border-bottom: 1px solid rgba(9, 9, 11, 0.08);
+  text-align: left;
+  white-space: nowrap;
+}
+
+.prose-coco th {
+  font-weight: 600;
+  color: #18181b;
+  background: rgba(9, 9, 11, 0.03);
+}
+
+html.dark .prose-coco th,
+html.dark .prose-coco td {
+  border-bottom-color: rgba(255, 255, 255, 0.1);
+}
+
+html.dark .prose-coco th {
+  color: #f4f4f5;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.prose-coco img {
+  border-radius: 14px;
+  border: 1px solid rgba(9, 9, 11, 0.08);
+}
+
+html.dark .prose-coco img {
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+/* 行内代码 */
+.prose-coco :not(pre) > code {
+  padding: 0.16em 0.4em;
+  border-radius: 5px;
+  background: rgba(9, 9, 11, 0.06);
+  color: #4338ca;
+  font-size: 0.875em;
+}
+
+html.dark .prose-coco :not(pre) > code {
+  background: rgba(255, 255, 255, 0.09);
+  color: #c7d2fe;
+}
+
+/* 代码块：深浅色都用深底，语法配色只需维护一套 */
+.prose-coco pre.code-block {
+  position: relative;
+  margin: 1.6em 0;
+  padding: 2.5rem 1.15rem 1.15rem;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 14px;
+  background: #0d0d12;
+  font-size: 13px;
+  line-height: 1.75;
+  overflow-x: auto;
+}
+
+.prose-coco pre.code-block::before {
+  content: attr(data-lang);
+  position: absolute;
+  left: 1.15rem;
+  top: 0.8rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 10.5px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.32);
+}
+
+.prose-coco pre.code-block code {
+  display: block;
+  padding: 0;
+  background: none;
+  color: #e4e4e7;
+  font-size: 13px;
+}
+
+/* 复制按钮由 JS 注入 */
+.code-copy {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.6rem;
+  padding: 0.3rem 0.55rem;
+  border: 0;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.55);
+  font-family: inherit;
+  font-size: 11px;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.code-copy:hover {
+  background: rgba(255, 255, 255, 0.16);
+  color: #fff;
+}
+
+/* 语法高亮（highlight.js class，深底配色） */
+.hljs-comment,
+.hljs-quote {
+  color: #6b7280;
+  font-style: italic;
+}
+
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-subst {
+  color: #c4b5fd;
+}
+
+.hljs-string,
+.hljs-regexp,
+.hljs-addition,
+.hljs-attribute {
+  color: #86efac;
+}
+
+.hljs-number,
+.hljs-literal,
+.hljs-meta {
+  color: #fbbf24;
+}
+
+.hljs-title,
+.hljs-title.function_,
+.hljs-section {
+  color: #93c5fd;
+}
+
+.hljs-built_in,
+.hljs-title.class_ {
+  color: #7dd3fc;
+}
+
+.hljs-variable,
+.hljs-template-variable,
+.hljs-attr {
+  color: #f9a8d4;
+}
+
+.hljs-type,
+.hljs-params {
+  color: #e4e4e7;
+}
+
+.hljs-symbol,
+.hljs-bullet,
+.hljs-link {
+  color: #fcd34d;
+}
+
+.hljs-deletion {
+  color: #fca5a5;
+}
+
+.hljs-emphasis {
+  font-style: italic;
+}
+
+.hljs-strong {
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .prose-coco {
+    font-size: 15px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

@@ -89,10 +89,10 @@ fs.writeFileSync(file, body, 'utf8')
 
 console.log(`
 已创建  src/posts/${slug}.md
-链接    blog.html#/post/${slug}
+链接    /#/post/${slug}
 
 接下来：
-  1. 边写边看   npm run dev   然后打开 http://localhost:5173/blog.html
+  1. 边写边看   npm run dev   然后打开 http://localhost:5173/#/blog
   2. 写完上线   npm run publish
 
 提示：

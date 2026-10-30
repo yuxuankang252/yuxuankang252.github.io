@@ -22,35 +22,47 @@ git(['add', '-A'])
 
 // 2. 没有改动就别空提交
 const staged = git(['diff', '--cached', '--name-status']).trim()
+let lines = []
+
 if (!staged) {
-  console.log('没有需要发布的改动。')
-  process.exit(0)
+  // 改动可能已经手动提交过了：这时不该直接退出，否则提交永远推不上去
+  let ahead = ''
+  try {
+    ahead = git(['log', '--oneline', 'origin/main..HEAD']).trim()
+  } catch (e) {
+    ahead = 'unknown' // 本地没有 origin/main 引用，交给下面的推送自己判断
+  }
+  if (!ahead) {
+    console.log('没有需要发布的改动。')
+    process.exit(0)
+  }
+  console.log(ahead === 'unknown' ? '工作区没有新改动，尝试推送本地提交…' : `没有新改动，但有 ${ahead.split(/\r?\n/).length} 个本地提交还没推上去：\n${ahead}`)
+} else {
+  lines = staged.split(/\r?\n/).filter(Boolean)
+
+  // 3. 提交信息：优先用这次动过的文章标题（新增或修改都算）
+  const changedPosts = lines
+    .filter((l) => /^[AM]\s+src\/posts\/.+\.md$/.test(l))
+    .map((l) => l.split(/\s+/)[2])
+
+  let message = 'chore: 更新站点内容'
+  if (changedPosts.length) {
+    const titles = changedPosts.map((file) => {
+      try {
+        const raw = fs.readFileSync(path.join(ROOT, file), 'utf8')
+        const m = raw.match(/^title:\s*(.+)$/m)
+        return m ? m[1].trim().replace(/^['"]|['"]$/g, '') : path.basename(file, '.md')
+      } catch (e) {
+        return path.basename(file, '.md')
+      }
+    })
+    message = `post: ${titles.join('、')}`
+  }
+
+  git(['commit', '-m', message])
+  console.log(`已提交  ${message}`)
+  console.log(lines.map((l) => '  ' + l).join('\n'))
 }
-
-const lines = staged.split(/\r?\n/).filter(Boolean)
-
-// 3. 提交信息：优先用这次动过的文章标题（新增或修改都算）
-const changedPosts = lines
-  .filter((l) => /^[AM]\s+src\/posts\/.+\.md$/.test(l))
-  .map((l) => l.split(/\s+/)[2])
-
-let message = 'chore: 更新站点内容'
-if (changedPosts.length) {
-  const titles = changedPosts.map((file) => {
-    try {
-      const raw = fs.readFileSync(path.join(ROOT, file), 'utf8')
-      const m = raw.match(/^title:\s*(.+)$/m)
-      return m ? m[1].trim().replace(/^['"]|['"]$/g, '') : path.basename(file, '.md')
-    } catch (e) {
-      return path.basename(file, '.md')
-    }
-  })
-  message = `post: ${titles.join('、')}`
-}
-
-git(['commit', '-m', message])
-console.log(`已提交  ${message}`)
-console.log(lines.map((l) => '  ' + l).join('\n'))
 
 // 4. 推送：先走 git，不通就换 API
 let pushed = false
@@ -77,5 +89,5 @@ if (!pushed) {
 console.log(`
 完成。GitHub Actions 会自动构建，1~2 分钟后刷新就能看到：
   首页  https://yuxuankang252.github.io/
-  博客  https://yuxuankang252.github.io/blog.html
+  博客  https://yuxuankang252.github.io/#/blog
 `)

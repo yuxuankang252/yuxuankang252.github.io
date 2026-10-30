@@ -1,8 +1,7 @@
 import { profile } from '../data/site.js'
 
-export default function Footer({ homePrefix = '' }) {
+export default function Footer() {
   const year = new Date().getFullYear()
-  const homeTop = homePrefix ? homePrefix : '#top'
 
   return (
     <footer className="border-t border-black/5 py-10 dark:border-white/10">
@@ -16,10 +15,10 @@ export default function Footer({ homePrefix = '' }) {
           </p>
         </div>
         <div className="flex items-center gap-5 text-xs text-zinc-500">
-          <a href="blog.html" className="transition hover:text-ink dark:hover:text-white">
+          <a href="#/blog" className="transition hover:text-ink dark:hover:text-white">
             博客
           </a>
-          <a href={homeTop} className="transition hover:text-ink dark:hover:text-white">
+          <a href="#top" className="transition hover:text-ink dark:hover:text-white">
             回到顶部
           </a>
         </div>

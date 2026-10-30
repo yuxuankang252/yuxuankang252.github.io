@@ -18,10 +18,10 @@ npm run preview  # 预览构建结果
 ## 目录结构
 
 ```
-index.html                  首页入口
-blog.html                   博客入口（Vite 多页）
+index.html                  唯一入口（首页 + 博客在同一页里切换）
 plugins/markdown.mjs        ← 把 .md 编译成 HTML 的 Vite 插件
 src/
+  App.jsx                   ← hash 路由：首页 / 博客列表 / 标签 / 正文
   data/site.js              ← 所有文案：姓名、GitHub、技能、经历
   posts/                    ← 文章放这里，一个 .md 一篇
   components/               Nav / Hero / About / Skills / Journey / Contact / Footer / MusicPlayer
@@ -33,11 +33,14 @@ src/
   theme.jsx                 深浅色主题（localStorage 记忆）
   index.css                 Tailwind 指令 + 自定义样式
 scripts/push-api.mjs        git 通道不通时的备用推送脚本
+public/blog.html            旧地址兜底：跳转到 /#/blog
 public/.nojekyll            GitHub Pages 用，别删
 .github/workflows/deploy.yml  推送即自动部署
 ```
 
 **改文案只需要动 `src/data/site.js`；写文章只需要往 `src/posts/` 里加文件。**
+
+> 为什么只有一个 HTML：首页和博客如果在两个 HTML 里，互相跳转等于重新加载页面，音乐播放器会被销毁、歌必然中断。现在两者是同页的两个 hash 视图，播放器只挂载一次，切页时一直播。
 
 ## 写一篇博客
 
@@ -45,7 +48,7 @@ public/.nojekyll            GitHub Pages 用，别删
 
 ```bash
 npm run new -- "文章标题"     # 1. 生成 src/posts/文章标题.md 骨架
-npm run dev                   # 2. 打开 http://localhost:5173/blog.html 边写边看
+npm run dev                   # 2. 打开 http://localhost:5173/#/blog 边写边看
 npm run publish               # 3. 发布上线
 ```
 
@@ -92,7 +95,7 @@ draft: false
 
 ### 链接与原理
 
-文章链接是 hash 形式（`blog.html#/post/slug`），刷新不会 404 —— GitHub Pages 没有服务端路由，这是唯一稳妥的做法。
+文章链接是 hash 形式（`/#/post/slug`），刷新不会 404 —— GitHub Pages 没有服务端路由，这是唯一稳妥的做法。旧的 `blog.html#/post/slug` 会自动跳到新地址。
 
 文章在**构建时**就被编译成 HTML 字符串（`plugins/markdown.mjs`），浏览器拿到的只有成品，不下载 markdown-it / highlight.js，所以 `blog` 这个包 gzip 后只有 8KB 左右。新增文件靠 `import.meta.glob` 自动发现，不需要注册、不需要改配置。
 

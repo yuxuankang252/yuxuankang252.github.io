@@ -10,11 +10,10 @@ export default defineConfig({
   base: './',
   build: {
     outDir: 'dist',
+    // 单页：首页与博客在同一个 index.html 里用 hash 切换，播放器因此只挂载一次。
+    // 旧的 blog.html 由 public/blog.html 兜底跳转。
     rollupOptions: {
-      input: {
-        main: resolve(process.cwd(), 'index.html'),
-        blog: resolve(process.cwd(), 'blog.html'),
-      },
+      input: { main: resolve(process.cwd(), 'index.html') },
     },
   },
 })

@@ -32,7 +32,7 @@ export default function Contact() {
                 GitHub
               </a>
               <a
-                href="blog.html"
+                href="#/blog"
                 className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-white/20 px-6 py-3 text-[15px] font-medium text-white transition hover:bg-white/10 sm:w-auto"
               >
                 <IconBook />

@@ -12,7 +12,7 @@ const links = [
 const linkClass =
   'rounded-lg px-3 py-2 text-sm text-zinc-600 transition hover:bg-black/5 hover:text-ink dark:text-zinc-400 dark:hover:bg-white/10 dark:hover:text-white'
 
-export default function Nav({ homePrefix = '', current = 'home' }) {
+export default function Nav({ current = 'home' }) {
   const { theme, toggle } = useTheme()
   const [solid, setSolid] = useState(false)
   const [open, setOpen] = useState(false)
@@ -24,8 +24,9 @@ export default function Nav({ homePrefix = '', current = 'home' }) {
     return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
-  const blogHref = 'blog.html'
-  const homeHref = homePrefix ? homePrefix : '#top'
+  // 全站单页：博客是 hash 视图（#/blog），不是另一个 HTML，点它不会重建页面
+  const blogHref = '#/blog'
+  const homeHref = '#top'
 
   return (
     <header
@@ -41,7 +42,7 @@ export default function Nav({ homePrefix = '', current = 'home' }) {
 
         <nav className="hidden items-center gap-1 md:flex">
           {links.map((item) => (
-            <a key={item.hash} href={`${homePrefix}${item.hash}`} className={linkClass}>
+            <a key={item.hash} href={item.hash} className={linkClass}>
               {item.label}
             </a>
           ))}
@@ -68,7 +69,7 @@ export default function Nav({ homePrefix = '', current = 'home' }) {
           </button>
 
           <a
-            href={`${homePrefix}#contact`}
+            href="#contact"
             className="hidden rounded-full bg-ink px-4 py-2 text-sm font-medium text-white transition hover:-translate-y-0.5 hover:shadow-lg hover:shadow-ink/20 sm:inline-flex dark:bg-white dark:text-ink"
           >
             联系我
@@ -91,7 +92,7 @@ export default function Nav({ homePrefix = '', current = 'home' }) {
           {links.map((item) => (
             <a
               key={item.hash}
-              href={`${homePrefix}${item.hash}`}
+              href={item.hash}
               onClick={() => setOpen(false)}
               className="block rounded-xl px-3 py-3 text-sm text-zinc-700 hover:bg-black/5 dark:text-zinc-300 dark:hover:bg-white/10"
             >
@@ -106,7 +107,7 @@ export default function Nav({ homePrefix = '', current = 'home' }) {
             博客
           </a>
           <a
-            href={`${homePrefix}#contact`}
+            href="#contact"
             onClick={() => setOpen(false)}
             className="mt-2 block rounded-xl bg-ink px-3 py-3 text-center text-sm font-medium text-white dark:bg-white dark:text-ink"
           >

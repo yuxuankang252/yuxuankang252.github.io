@@ -51,7 +51,7 @@ export default function Hero() {
               <IconArrowRight />
             </a>
             <a
-              href="blog.html"
+              href="#/blog"
               className="inline-flex items-center gap-2 rounded-full border border-black/10 bg-white/70 px-6 py-3 text-[15px] font-medium text-ink shadow-sm backdrop-blur transition hover:-translate-y-0.5 hover:border-black/20 dark:border-white/15 dark:bg-white/5 dark:text-white dark:hover:border-white/30"
             >
               <IconBook />

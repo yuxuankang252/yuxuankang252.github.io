@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>博客 · Coco</title>
+    <meta name="robots" content="noindex" />
+    <script>
+      // 旧地址兜底：blog.html[#/post/xxx] → ./[#/post/xxx]
+      // 站点已经合并成单页，博客在首页的 #/ 视图里，音乐才不会因整页跳转中断。
+      (function () {
+        var hash = window.location.hash;
+        if (!hash || hash === '#') hash = '#/blog';
+        window.location.replace('./' + hash);
+      })();
+    </script>
+  </head>
+  <body style="font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; padding: 40px; color: #52525b">
+    <p>正在跳转到 <a href="./#/blog">博客</a>…</p>
+  </body>
+</html>

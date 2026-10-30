@@ -41,7 +41,24 @@ public/.nojekyll            GitHub Pages 用，别删
 
 ## 写一篇博客
 
-在 `src/posts/` 新建一个 `.md` 文件，文件名就是链接里的 slug（`backprop-from-scratch.md` → `blog.html#/post/backprop-from-scratch`）：
+### 四步
+
+```bash
+npm run new -- "文章标题"              # 1. 生成 src/posts/文章标题.md 骨架
+npm run dev                            # 2. 打开 http://localhost:5173/blog.html 边写边看
+git add -A && git commit -m "post: 文章标题" && git push   # 3. 上线
+```
+
+第 4 步是等 1~2 分钟，Actions 构建完刷新线上地址就能看到。
+
+`npm run new` 第二个参数是链接里的英文短名，可省略：
+
+```bash
+npm run new -- "梯度校验" grad-check   # -> src/posts/grad-check.md，链接 #/post/grad-check
+npm run new -- "梯度校验"              # -> 用标题生成，中文也能用（分享时浏览器会自动编码）
+```
+
+### 文件长什么样
 
 ```markdown
 ---
@@ -55,12 +72,27 @@ draft: false
 正文从这里开始，用普通 Markdown 写就行。
 ```
 
-- `title` / `date` / `tags` / `summary` 四项是给列表页和 SEO 用的；`draft: true` 的文章不会出现在站点上。
-- `##` 和 `###` 标题会自动生成锚点并汇总成右侧目录。
-- 代码块用 ````` ```python ``` `` 这样的围栏写法，构建时用 highlight.js 上色，页面上每块都会自动出现「复制」按钮。
-- 图片放进 `public/posts/`，正文里写 `![](posts/xxx.png)`（`public/` 下的文件会原样复制到 `dist/` 根目录）。
+| 字段 | 作用 |
+|---|---|
+| `title` | 列表和文章页的大标题，也写进浏览器标签 |
+| `date` | 排序用，`YYYY-MM-DD`，越新越靠前 |
+| `tags` | 写成 `[机器学习, NumPy]`，列表页就能按标签筛选 |
+| `summary` | 列表卡片上的两行摘要；留空会用默认文案 |
+| `draft` | `true` 就不上线，写一半可以先存着 |
 
-文章链接是 hash 形式（`blog.html#/post/slug`），这样在 GitHub Pages 上刷新不会 404。上线流程和改文案一样：`git commit` + 推送，Actions 会自动构建。
+### 写的时候要知道的几件事
+
+- **小标题**：`##` 和 `###` 会自动生成锚点、汇总成右侧目录、并参与滚动高亮。`#` 一级标题不用写（页面已有标题）。
+- **代码块**：用 ` ```python ` 这样的围栏，构建时用 highlight.js 上色，每块右上角自动出现「复制」按钮。语言名写错也不会崩，只是不上色。
+- **图片**：放进 `public/posts/`，正文写 `![](posts/xxx.png)`。`public/` 下的文件会原样复制到 `dist/`，所以路径是相对站点根目录的。
+- **表格、引用、任务列表、脚注**：markdown-it 默认都支持，直接写。
+- **站外链接**：自动加 `target="_blank"`，不用自己写。
+
+### 链接与原理
+
+文章链接是 hash 形式（`blog.html#/post/slug`），刷新不会 404 —— GitHub Pages 没有服务端路由，这是唯一稳妥的做法。
+
+文章在**构建时**就被编译成 HTML 字符串（`plugins/markdown.mjs`），浏览器拿到的只有成品，不下载 markdown-it / highlight.js，所以 `blog` 这个包 gzip 后只有 8KB 左右。新增文件靠 `import.meta.glob` 自动发现，不需要注册、不需要改配置。
 
 ## 音乐播放器
 

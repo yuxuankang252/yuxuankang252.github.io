@@ -12,7 +12,7 @@ export default function Footer({ homePrefix = '' }) {
             {profile.initials}
           </span>
           <p className="text-xs text-zinc-500">
-            © {year} {profile.name} · React + Tailwind CSS
+            © {year} {profile.name}
           </p>
         </div>
         <div className="flex items-center gap-5 text-xs text-zinc-500">

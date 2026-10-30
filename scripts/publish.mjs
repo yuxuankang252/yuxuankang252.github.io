@@ -29,14 +29,14 @@ if (!staged) {
 
 const lines = staged.split(/\r?\n/).filter(Boolean)
 
-// 3. 提交信息：优先用这次新增的文章标题
-const addedPosts = lines
-  .filter((l) => /^A\s+src\/posts\/.+\.md$/.test(l))
+// 3. 提交信息：优先用这次动过的文章标题（新增或修改都算）
+const changedPosts = lines
+  .filter((l) => /^[AM]\s+src\/posts\/.+\.md$/.test(l))
   .map((l) => l.split(/\s+/)[2])
 
 let message = 'chore: 更新站点内容'
-if (addedPosts.length) {
-  const titles = addedPosts.map((file) => {
+if (changedPosts.length) {
+  const titles = changedPosts.map((file) => {
     try {
       const raw = fs.readFileSync(path.join(ROOT, file), 'utf8')
       const m = raw.match(/^title:\s*(.+)$/m)

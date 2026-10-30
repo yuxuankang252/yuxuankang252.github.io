@@ -41,15 +41,17 @@ public/.nojekyll            GitHub Pages 用，别删
 
 ## 写一篇博客
 
-### 四步
+### 三步
 
 ```bash
-npm run new -- "文章标题"              # 1. 生成 src/posts/文章标题.md 骨架
-npm run dev                            # 2. 打开 http://localhost:5173/blog.html 边写边看
-git add -A && git commit -m "post: 文章标题" && git push   # 3. 上线
+npm run new -- "文章标题"     # 1. 生成 src/posts/文章标题.md 骨架
+npm run dev                   # 2. 打开 http://localhost:5173/blog.html 边写边看
+npm run publish               # 3. 发布上线
 ```
 
-第 4 步是等 1~2 分钟，Actions 构建完刷新线上地址就能看到。
+保存文件后本地页面会立刻刷新；`npm run publish` 会暂存、提交、推送，GitHub Actions 大约 1~2 分钟构建完，刷新线上地址就能看到。
+
+> `npm run publish` 会先试 `git push`，不通就自动换成 Git Data API 通道（这台机器的代理只放行 `api.github.com`，`git push` 会报 502）。所以你只需要记这一条命令。
 
 `npm run new` 第二个参数是链接里的英文短名，可省略：
 

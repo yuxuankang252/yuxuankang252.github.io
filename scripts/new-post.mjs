@@ -93,8 +93,7 @@ console.log(`
 
 接下来：
   1. 边写边看   npm run dev   然后打开 http://localhost:5173/blog.html
-  2. 写完上线   git add -A && git commit -m "post: ${title}" && git push
-                （推不上去就用 node scripts/push-api.mjs）
+  2. 写完上线   npm run publish
 
 提示：
   · tags 写成 [机器学习, NumPy] 这样，列表页就能按标签筛选

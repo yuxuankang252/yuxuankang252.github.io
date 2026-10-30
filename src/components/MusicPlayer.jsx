@@ -14,6 +14,11 @@ import {
 
 const VOLUME_KEY = 'music:volume'
 
+// 首页和博客是两个独立的 HTML 入口（Vite 多页），点「博客」是整页导航：
+// 旧页面卸载 → <audio> 一起销毁 → 声音必然断掉。跨文档没法让同一个音频元素活下来，
+// 所以退一步：把「在放哪首、放到第几秒、要不要接着放」写进 sessionStorage，新页面接着播。
+const RESUME_KEY = 'music:resume'
+
 function readVolume() {
   try {
     const raw = localStorage.getItem(VOLUME_KEY)
@@ -24,12 +29,32 @@ function readVolume() {
   return 0.75
 }
 
+// 读上一次的播放状态；十分钟以前的不算，免得隔太久突然出声
+function readResume() {
+  try {
+    const raw = sessionStorage.getItem(RESUME_KEY)
+    if (!raw) return null
+    const s = JSON.parse(raw)
+    if (!s || !s.name) return null
+    if (Date.now() - (Number(s.at) || 0) > 10 * 60 * 1000) return null
+    return s // playing 为 false 时只记「上次听的是哪首」，不自动播
+  } catch (e) {
+    return null
+  }
+}
+
 export default function MusicPlayer() {
   const audioRef = useRef(null)
   const wantPlay = useRef(false) // 记录"播不播"的意图，切歌后据此决定是否自动继续
   const lyricRef = useRef([])
   const failCount = useRef(0)
   const noteTimer = useRef(null)
+  const resumeRef = useRef(null) // 上一次在播的歌，等歌单到位后接上
+  const pendingSeek = useRef(null) // 换页续播时要跳到的秒数
+  const snap = useRef({ name: '', artist: '' }) // 当前曲目，写 sessionStorage 用
+  const volRef = useRef({ volume: 0.75, muted: false })
+  const lastSave = useRef(0)
+  const autoLoadStarted = useRef(false)
 
   const [tracks, setTracks] = useState([])
   const [status, setStatus] = useState('idle') // idle | loading | ready | error
@@ -44,6 +69,7 @@ export default function MusicPlayer() {
   const [lyricIdx, setLyricIdx] = useState(-1)
   const [note, setNote] = useState('')
   const [refreshing, setRefreshing] = useState(false)
+  const [needTap, setNeedTap] = useState(false) // 换页后浏览器拦了自动播放，等用户点一下
 
   const track = tracks[index] || null
 
@@ -98,6 +124,125 @@ export default function MusicPlayer() {
     [status, tracks, toast],
   )
 
+  /* ---------- 跨页面续播 ---------- */
+  // 写一次「现在放到哪」，供下一个页面接上
+  const saveState = useCallback(() => {
+    const a = audioRef.current
+    const s = snap.current
+    if (!a || !s.name) return
+    // 「播不播」看的是意图而不是 paused：整页跳转时浏览器会先把音频暂停，
+    // 用 paused 判断会把意图丢掉，下一页就接不上了。
+    const playing = wantPlay.current
+    try {
+      sessionStorage.setItem(
+        RESUME_KEY,
+        JSON.stringify({
+          name: s.name,
+          artist: s.artist,
+          time: a.currentTime || 0,
+          playing,
+          volume: volRef.current.volume,
+          muted: volRef.current.muted,
+          at: Date.now(),
+        }),
+      )
+    } catch (e) {}
+  }, [])
+
+  useEffect(() => {
+    volRef.current = { volume, muted }
+  }, [volume, muted])
+
+  // 新页面挂载：有没播完的歌就先把歌单拉下来，等定位到那首再接着放
+  useEffect(() => {
+    const r = readResume()
+    if (!r) return
+    resumeRef.current = r
+    if (Number.isFinite(r.volume) && r.volume >= 0 && r.volume <= 1) setVolume(r.volume)
+    if (typeof r.muted === 'boolean') setMuted(r.muted)
+    if (autoLoadStarted.current) return
+    autoLoadStarted.current = true
+    load()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  // 歌单到位后，按「歌名 + 歌手」把上次那首找出来
+  useEffect(() => {
+    const r = resumeRef.current
+    if (!r || !tracks.length) return
+    const j = tracks.findIndex((t) => t.name === r.name && t.artist === r.artist)
+    if (j < 0) {
+      resumeRef.current = null // 歌被移出歌单了，就别硬找
+      return
+    }
+    if (j !== index) setIndex(j)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [tracks])
+
+  // 关页 / 切后台时存一次：整页导航时 pagehide 里的 currentTime 最准
+  useEffect(() => {
+    const onHide = () => saveState()
+    const onVisibility = () => {
+      if (document.visibilityState === 'hidden') onHide()
+    }
+    window.addEventListener('pagehide', onHide)
+    window.addEventListener('beforeunload', onHide)
+    document.addEventListener('visibilitychange', onVisibility)
+    return () => {
+      window.removeEventListener('pagehide', onHide)
+      window.removeEventListener('beforeunload', onHide)
+      document.removeEventListener('visibilitychange', onVisibility)
+    }
+  }, [saveState])
+
+  // 换页后浏览器不认「自动播放」：用户在新页面上随便点一下或按个键，就把歌接上
+  useEffect(() => {
+    if (!needTap) return
+    const resume = () => {
+      const a = audioRef.current
+      if (!a) return
+      wantPlay.current = true
+      a.play()
+        .then(() => {
+          setPlaying(true)
+          setNeedTap(false)
+        })
+        .catch(() => {})
+    }
+    window.addEventListener('pointerdown', resume, true)
+    window.addEventListener('keydown', resume, true)
+    return () => {
+      window.removeEventListener('pointerdown', resume, true)
+      window.removeEventListener('keydown', resume, true)
+    }
+  }, [needTap])
+
+  // 从 bfcache 返回（浏览器把整页缓存了，JS 不会重跑）：手动把歌接回来
+  useEffect(() => {
+    const onPageShow = (e) => {
+      if (!e.persisted) return
+      const a = audioRef.current
+      if (!a || !snap.current.name || !wantPlay.current || !a.paused) return
+      // 缓存里存的是离开那一刻的进度，sessionStorage 可能更新（在另一页又放了一会儿）
+      const s = readResume()
+      const t = s && s.name === snap.current.name ? Number(s.time) || 0 : 0
+      if (Number.isFinite(t) && t > a.currentTime + 1) {
+        try {
+          a.currentTime = t
+          setCur(t)
+        } catch (err) {}
+      }
+      a.play()
+        .then(() => {
+          setPlaying(true)
+          setNeedTap(false)
+        })
+        .catch(() => setNeedTap(true))
+    }
+    window.addEventListener('pageshow', onPageShow)
+    return () => window.removeEventListener('pageshow', onPageShow)
+  }, [])
+
   /* ---------- 音量 ---------- */
   useEffect(() => {
     const a = audioRef.current
@@ -116,13 +261,42 @@ export default function MusicPlayer() {
     setCur(0)
     setDur(0)
     setLyricIdx(-1)
+    snap.current = { name: track.name, artist: track.artist }
+
+    // 这条正好是上一个页面那首：把进度接上；上次在播才继续播
+    const r = resumeRef.current
+    const isResume = !!(r && r.name === track.name && r.artist === track.artist)
+    if (isResume) {
+      resumeRef.current = null
+      // 在播的才补上页面切换花掉的那一两秒（暂停着过来的不该跳时间）
+      const waited = r.playing
+        ? Math.max(0, Math.min(20, (Date.now() - (Number(r.at) || Date.now())) / 1000))
+        : 0
+      const target = Math.max(0, (Number(r.time) || 0) + waited)
+      pendingSeek.current = target
+      setCur(target)
+      wantPlay.current = !!r.playing
+      // 不管上次是播是停，都先读一下元数据：进度条要能显示正确的总时长
+      a.preload = 'metadata'
+      a.load()
+    } else {
+      a.preload = 'none'
+    }
 
     if (wantPlay.current) {
       a.play()
-        .then(() => setPlaying(true))
+        .then(() => {
+          setPlaying(true)
+          setNeedTap(false)
+        })
         .catch(() => {
           setPlaying(false)
-          wantPlay.current = false
+          if (isResume) {
+            // 整页导航后没有用户手势，浏览器会拦下自动播放 → 提示一下，点任意处就续上
+            setNeedTap(true)
+          } else {
+            wantPlay.current = false
+          }
         })
     } else {
       setPlaying(false)
@@ -232,6 +406,13 @@ export default function MusicPlayer() {
     const t = e.currentTarget.currentTime
     setCur(t)
 
+    // 每 3 秒存一次进度，页面被直接关掉时也不至于丢太多
+    const now = Date.now()
+    if (now - lastSave.current > 3000) {
+      lastSave.current = now
+      saveState()
+    }
+
     const lines = lyricRef.current
     if (!lines.length) return
 
@@ -279,10 +460,27 @@ export default function MusicPlayer() {
         onPlay={() => {
           failCount.current = 0
           setPlaying(true)
+          saveState()
         }}
-        onPause={() => setPlaying(false)}
+        onPause={() => {
+          setPlaying(false)
+          saveState()
+        }}
         onTimeUpdate={onTimeUpdate}
-        onLoadedMetadata={(e) => setDur(e.currentTarget.duration || 0)}
+        onLoadedMetadata={(e) => {
+          const el = e.currentTarget
+          setDur(el.duration || 0)
+          // 换页续播：元数据到了才知道能不能跳，跳完再交给 play()
+          const t = pendingSeek.current
+          if (t == null) return
+          pendingSeek.current = null
+          const dur = el.duration
+          if (Number.isFinite(dur) && dur > 0 && t >= dur - 0.5) return // 上次已经放完了，别跳
+          try {
+            el.currentTime = t
+            setCur(t)
+          } catch (err) {}
+        }}
         onEnded={() => step(1, true)}
         onError={onError}
       />
@@ -559,13 +757,35 @@ export default function MusicPlayer() {
         </div>
       )}
 
+      {/* 换页后自动播放被浏览器拦下：给一个明显的入口（点页面任意处也能续上） */}
+      {needTap && (
+        <button
+          type="button"
+          onClick={() => {
+            const a = audioRef.current
+            if (!a) return
+            wantPlay.current = true
+            a.play()
+              .then(() => {
+                setPlaying(true)
+                setNeedTap(false)
+              })
+              .catch(() => {})
+          }}
+          className="fixed bottom-6 left-1/2 z-[61] flex max-w-[92vw] -translate-x-1/2 items-center gap-2 rounded-full bg-ink px-4 py-2.5 text-[12px] font-medium text-white shadow-xl shadow-ink/25 transition hover:-translate-y-0.5 dark:bg-white dark:text-ink"
+        >
+          <IconPlay className="h-3.5 w-3.5 shrink-0 translate-x-[1px]" />
+          <span className="truncate">继续播放{track?.name ? ` · ${track.name}` : ''}</span>
+        </button>
+      )}
+
       {/* 提示条（放在面板外层，避开 transform 容器对 fixed 的影响） */}
       <div
         role="status"
         aria-live="polite"
-        className={`pointer-events-none fixed bottom-6 left-1/2 z-[60] -translate-x-1/2 whitespace-nowrap rounded-full bg-ink px-3.5 py-2 text-[11.5px] font-medium text-white shadow-lg transition dark:bg-white dark:text-ink ${
-          note ? 'opacity-100' : 'opacity-0'
-        }`}
+        className={`pointer-events-none fixed left-1/2 z-[60] -translate-x-1/2 whitespace-nowrap rounded-full bg-ink px-3.5 py-2 text-[11.5px] font-medium text-white shadow-lg transition dark:bg-white dark:text-ink ${
+          needTap ? 'bottom-[4.9rem]' : 'bottom-6'
+        } ${note ? 'opacity-100' : 'opacity-0'}`}
       >
         {note || '　'}
       </div>
